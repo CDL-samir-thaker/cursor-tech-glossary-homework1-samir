@@ -89,13 +89,23 @@ function createGlossaryCard(entry) {
 function renderGlossary(entries) {
     const container = document.getElementById('glossaryContainer');
     const emptyState = document.getElementById('emptyState');
+    const resultsCount = document.getElementById('resultsCount');
+    const totalTerms = glossaryData.length;
 
     if (entries.length === 0) {
         container.innerHTML = '';
         emptyState.classList.remove('hidden');
+        resultsCount.textContent = 'No results found';
     } else {
         emptyState.classList.add('hidden');
         container.innerHTML = entries.map(entry => createGlossaryCard(entry)).join('');
+        
+        // Update results count
+        if (entries.length === totalTerms) {
+            resultsCount.textContent = 'Showing all terms';
+        } else {
+            resultsCount.textContent = `Showing ${entries.length} of ${totalTerms} terms`;
+        }
     }
 }
 
@@ -116,6 +126,96 @@ function filterGlossary(query) {
     });
 }
 
+// Get search suggestions based on query
+function getSuggestions(query) {
+    const searchTerm = query.toLowerCase().trim();
+    
+    if (!searchTerm) {
+        return [];
+    }
+    
+    // Find terms that match the query
+    const suggestions = glossaryData
+        .filter(entry => entry.term.toLowerCase().includes(searchTerm))
+        .map(entry => entry.term)
+        .slice(0, 5); // Limit to 5 suggestions
+    
+    return suggestions;
+}
+
+// Render search suggestions
+function renderSuggestions(suggestions) {
+    const dropdown = document.getElementById('suggestionsDropdown');
+    
+    if (suggestions.length === 0) {
+        dropdown.classList.add('hidden');
+        return;
+    }
+    
+    const suggestionsHTML = suggestions
+        .map(term => `
+            <button 
+                class="suggestion-item w-full text-left px-4 py-2.5 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none text-gray-800 font-medium border-b border-gray-100 last:border-b-0"
+                role="option"
+                aria-label="Select ${term}"
+            >
+                ${term}
+            </button>
+        `)
+        .join('');
+    
+    dropdown.innerHTML = suggestionsHTML;
+    dropdown.classList.remove('hidden');
+    
+    // Add click handlers to suggestions
+    const suggestionButtons = dropdown.querySelectorAll('.suggestion-item');
+    suggestionButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const term = button.textContent.trim();
+            selectSuggestion(term);
+        });
+    });
+}
+
+// Select a suggestion
+function selectSuggestion(term) {
+    const searchInput = document.getElementById('searchInput');
+    searchInput.value = term;
+    
+    const filteredEntries = filterGlossary(term);
+    renderGlossary(filteredEntries);
+    toggleClearButton();
+    
+    // Hide suggestions
+    document.getElementById('suggestionsDropdown').classList.add('hidden');
+}
+
+// Hide suggestions dropdown
+function hideSuggestions() {
+    document.getElementById('suggestionsDropdown').classList.add('hidden');
+}
+
+// Toggle clear button visibility
+function toggleClearButton() {
+    const searchInput = document.getElementById('searchInput');
+    const clearButton = document.getElementById('clearButton');
+    
+    if (searchInput.value.trim()) {
+        clearButton.classList.remove('hidden');
+    } else {
+        clearButton.classList.add('hidden');
+    }
+}
+
+// Clear search input
+function clearSearch() {
+    const searchInput = document.getElementById('searchInput');
+    searchInput.value = '';
+    searchInput.focus();
+    toggleClearButton();
+    renderGlossary(glossaryData);
+}
+
 // Initialize the application
 function init() {
     // Render initial glossary
@@ -123,9 +223,36 @@ function init() {
 
     // Setup search functionality
     const searchInput = document.getElementById('searchInput');
+    const clearButton = document.getElementById('clearButton');
+    
     searchInput.addEventListener('input', (e) => {
-        const filteredEntries = filterGlossary(e.target.value);
+        const query = e.target.value;
+        const filteredEntries = filterGlossary(query);
         renderGlossary(filteredEntries);
+        toggleClearButton();
+        
+        // Show suggestions
+        const suggestions = getSuggestions(query);
+        renderSuggestions(suggestions);
+    });
+    
+    // Setup clear button
+    clearButton.addEventListener('click', clearSearch);
+    
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        const searchSection = e.target.closest('[role="search"]');
+        if (!searchSection) {
+            hideSuggestions();
+        }
+    });
+    
+    // Hide suggestions on Escape key
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            hideSuggestions();
+            searchInput.blur();
+        }
     });
 }
 
