@@ -1,0 +1,59 @@
+# Project Rules and Custom Commands
+
+## Custom Command: /exec-review-polish
+
+### Purpose
+Polish selected HTML markup for executive review presentations with improved typography, spacing, and visual hierarchy.
+
+### When to Use
+Run this command on selected HTML elements (cards, headers, sections, or any content blocks) that need to be presentation-ready for stakeholder reviews.
+
+### Instructions for AI Assistant
+
+When the user runs `/exec-review-polish` on selected HTML:
+
+1. **Typography & Spacing**
+   - Improve line-height, letter-spacing, and font sizes for easy scanning
+   - Add appropriate margin/padding to create visual breathing room
+   - Ensure headings have clear hierarchy (size, weight, spacing)
+
+2. **Visual Distinction**
+   - Make key labels (status, owner, titles, metadata) visually distinct
+   - Use bold, color, or background to highlight important information
+   - Ensure scannable patterns (e.g., labels aligned, consistent positioning)
+
+3. **Accessibility Requirements**
+   - Maintain WCAG AA color contrast ratios (4.5:1 for text, 3:1 for large text)
+   - Use readable font sizes (minimum 14px for body, 16px+ preferred)
+   - Add ARIA labels where appropriate
+   - Ensure keyboard navigation support
+
+4. **Content Preservation**
+   - Keep all data and wording exactly as-is
+   - Do NOT change text content, values, or information
+   - Only modify HTML structure, CSS classes, and presentation
+
+5. **Scope of Changes**
+   - Prefer small, focused improvements over full rewrites
+   - Focus on the selected section only
+   - Use existing CSS classes/frameworks when possible
+   - Add minimal custom CSS if needed
+   - Maintain consistency with the rest of the project
+
+6. **Executive Review Optimization**
+   - Prioritize scannability: key info should be found in <3 seconds
+   - Use visual weight to guide attention to important elements
+   - Create clear visual separation between sections
+   - Ensure information hierarchy is immediately obvious
+
+### Example Improvements
+- Status badges: Make them prominent with good contrast
+- Titles: Increase font size, add spacing, make bold
+- Metadata: Use subtle styling (smaller text, muted colors)
+- Sections: Add clear borders or background colors for separation
+- Lists: Improve bullet/number styling, increase spacing
+- Tables: Add zebra striping, bold headers, align content
+
+### Output
+Provide the modified HTML/CSS with clear comments explaining what was improved and why.
+
