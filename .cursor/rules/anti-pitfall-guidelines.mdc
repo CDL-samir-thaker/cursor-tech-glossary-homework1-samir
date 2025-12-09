@@ -1,0 +1,177 @@
+---
+alwaysApply: false
+---
+
+# Anti-Pitfall Guidelines
+
+Guidelines to avoid common mistakes and pitfalls when working on this Tech Glossary project.
+
+---
+
+## Planning Principles
+
+When creating plans, follow these principles:
+
+1. **MVP First**: Focus on core functionality before adding features
+
+2. **Dependency Awareness**: Identify and sequence dependent tasks clearly
+
+3. **Iterative Milestones**: Break work into independently valuable chunks
+
+4. **Avoid Over-Engineering**: Start with the happy path, add edge cases later
+
+5. **Clear Scope**: Separate must-haves from nice-to-haves explicitly
+
+---
+
+## DOM Manipulation
+
+### ❌ Don't
+- Use `innerHTML` with unsanitized user input
+- Query the DOM repeatedly inside loops
+- Forget to check if elements exist before manipulating them
+
+### ✅ Do
+- Cache DOM element references at the top of functions
+- Use template literals for HTML construction (as done in `createGlossaryCard`)
+- Always verify element existence: `const el = document.getElementById('x'); if (el) { ... }`
+
+---
+
+## Event Handling
+
+### ❌ Don't
+- Add event listeners inside loops without cleanup
+- Forget to handle keyboard events for accessibility (Escape, Enter, Arrow keys)
+- Use inline event handlers in HTML (`onclick="..."`)
+
+### ✅ Do
+- Use event delegation where appropriate
+- Pair focus events with keyboard navigation support
+- Add event listeners in the `init()` function for centralized management
+- Always include `blur()` handling for focus traps
+
+---
+
+## Search & Filtering
+
+### ❌ Don't
+- Perform case-sensitive searches without user expectation
+- Forget to handle empty/whitespace-only queries
+- Filter on every keystroke without debouncing (for large datasets)
+
+### ✅ Do
+- Use `.toLowerCase().trim()` consistently for search normalization
+- Return the full dataset when the query is empty
+- Update UI feedback (results count, empty state) alongside filtered results
+
+---
+
+## Accessibility (a11y)
+
+### ❌ Don't
+- Use color alone to convey information
+- Forget ARIA labels on interactive elements
+- Ignore keyboard navigation
+
+### ✅ Do
+- Maintain WCAG AA contrast ratios (4.5:1 for normal text, 3:1 for large text)
+- Add `role` and `aria-*` attributes to custom components
+- Ensure all interactive elements are focusable and have visible focus states
+- Include `aria-label` or `aria-labelledby` for screen readers
+- Support Escape key to dismiss modals/dropdowns
+
+---
+
+## Tailwind CSS
+
+### ❌ Don't
+- Use arbitrary values (`text-[#abc123]`) when semantic classes exist
+- Mix incompatible utility classes (e.g., `hidden` with `flex`)
+- Forget responsive prefixes for mobile-first design
+
+### ✅ Do
+- Use the predefined color palette for consistency
+- Apply focus ring utilities for keyboard navigation: `focus:ring-2 focus:ring-blue-500`
+- Use consistent spacing scale (`gap-1.5`, `mb-3`, `py-2.5`)
+- Prefer semantic color names from `tagColors` mapping
+
+---
+
+## Data Management
+
+### ❌ Don't
+- Mutate the original `glossaryData` array directly
+- Hardcode data that should come from the data source
+- Forget to handle missing or undefined properties
+
+### ✅ Do
+- Treat `glossaryData` as immutable; use `.filter()`, `.map()` to create new arrays
+- Provide fallback values: `tagColors[tag] || "bg-gray-700 text-white"`
+- Keep data transformations pure and side-effect free
+
+---
+
+## Testing
+
+### ❌ Don't
+- Write tests that depend on implementation details
+- Skip edge cases (empty input, special characters, very long strings)
+- Forget to test accessibility features
+
+### ✅ Do
+- Test behavior, not implementation
+- Include tests for: empty states, boundary conditions, user interactions
+- Verify ARIA attributes and keyboard navigation in UI tests
+- Run tests with `npm test` before committing
+
+---
+
+## HTML Structure
+
+### ❌ Don't
+- Use `<div>` when semantic elements exist (`<article>`, `<section>`, `<header>`)
+- Nest interactive elements (`<button>` inside `<a>`)
+- Forget `id` attributes needed for `aria-labelledby`
+
+### ✅ Do
+- Use semantic HTML: `<article>` for glossary cards, `<section>` for groupings
+- Generate unique IDs for linking labels: `term-${entry.term.replace(/\s+/g, '-').toLowerCase()}`
+- Keep heading hierarchy logical (h1 → h2 → h3)
+
+---
+
+## Performance
+
+### ❌ Don't
+- Re-render the entire DOM when only part needs updating
+- Create closures with large captured scopes unnecessarily
+- Load external scripts synchronously in `<head>`
+
+### ✅ Do
+- Use `classList.add/remove` for show/hide instead of re-rendering
+- Place scripts at the end of `<body>` or use `defer`
+- Batch DOM updates when possible
+
+---
+
+## Common Bugs to Watch For
+
+1. **Dropdown not hiding**: Ensure click-outside handler checks the correct parent selector
+2. **Search not clearing**: Verify `toggleClearButton()` is called after state changes
+3. **Focus trap**: Always provide Escape key handlers for dismissible UI
+4. **Tag colors missing**: New tags need entries in `tagColors` object
+5. **Empty state flash**: Check order of `classList.add('hidden')` vs content updates
+
+---
+
+## Quick Reference Checklist
+
+Before submitting changes:
+- [ ] All interactive elements have keyboard support
+- [ ] ARIA labels are present and accurate
+- [ ] Search handles edge cases (empty, whitespace, special chars)
+- [ ] No console errors in browser DevTools
+- [ ] Tests pass: `npm test`
+- [ ] Color contrast meets WCAG AA standards
+- [ ] New tags have color mappings
